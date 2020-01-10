@@ -11,7 +11,7 @@ class NegociacaoController {
         this._listaNegociacoes = new Bind(
             new ListaNegociacoes(),
             new NegociacoesView($('#negociacoes-view')),
-            'adiciona', 'limpa');        
+            'adiciona', 'limpa', 'ordena', 'inverteOrdem');        
 
         this._mensagem = new Bind(
             new Mensagem(), 
@@ -32,6 +32,26 @@ class NegociacaoController {
     apagar(event) {
         this._listaNegociacoes.limpa();
         this._mensagem.texto = "Lista de negociações apagadas com sucesso!";
+    }
+
+    importaNegociaocoes() {
+        let service = new NegociacaoService();
+        service
+        .obterNegociacoes()
+        .then(negociacoes => {
+          negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+          this._mensagem.texto = 'Negociações do período importadas com sucesso';
+        })
+        .catch(error => this._mensagem.texto = error);          
+    }
+
+    ordena(coluna) {
+        if(this._ordemAtual == coluna) {
+            this._listaNegociacoes.inverteOrdem();
+        } else {
+            this._listaNegociacoes.ordena((a, b) => a[coluna] - b[coluna]);    
+        }
+        this._ordemAtual = coluna;
     }
 
     _criaNegociacao() {

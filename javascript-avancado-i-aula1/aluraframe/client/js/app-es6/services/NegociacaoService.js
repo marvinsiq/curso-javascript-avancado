@@ -1,4 +1,9 @@
-class NegociacaoService {
+import { HttpService } from './HttpService';
+import { ConnectionFactory } from './ConnectionFactory';
+import { NegociacaoDAO } from '../dao/NegociacaoDAO';
+import { Negociacao } from '../models/Negociacao';
+
+export class NegociacaoService {
 
     constructor() {
 
@@ -19,7 +24,7 @@ class NegociacaoService {
 
         }).catch(erro => {
             throw new Error(erro);
-        });            
+        });
     }
 
     obterNegociacoesDaSemana() {
@@ -36,7 +41,7 @@ class NegociacaoService {
             .catch(erro => {
                 console.log(erro);
                 throw new Error('Não foi possível obter as negociações da semana');
-            });  
+            });
     }
 
     obterNegociacoesDaSemanaAnterior() {
@@ -53,7 +58,7 @@ class NegociacaoService {
             .catch(erro => {
                 console.log(erro);
                 throw new Error('Não foi possível obter as negociações da semana anterior');
-            });  
+            });
     }
 
     obterNegociacoesDaSemanaRetrasada() {
@@ -70,7 +75,54 @@ class NegociacaoService {
             .catch(erro => {
                 console.log(erro);
                 throw new Error('Não foi possível obter as negociações da semana retrasada');
-            });  
+            });
 
+    }
+
+    cadastra(negociacao) {
+        return ConnectionFactory
+            .getConnection()
+            .then(conexao => new NegociacaoDAO(conexao))
+            .then(dao => dao.adiciona(negociacao))
+            .then(() => 'Negociação cadastrada com sucesso')
+            .catch(erro => {
+                throw new Error("Não foi possível adicionar a negociação")
+            });
+    }
+
+    lista() {
+        return ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDAO(connection))
+            .then(dao => dao.listaTodas())
+            .catch(erro => {
+                console.log(erro);
+                throw new Error('Não foi possível obter as negociações.');
+            });
+    }
+
+    apaga() {
+        return ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDAO(connection))
+            .then(dao => dao.apagaTodos())
+            .then('Negociações apagadas com sucesso.')
+            .catch(erro => {
+                console.log(erro);
+                throw new Error('Não foi possível apagar as negociações.');
+            });
+    }
+
+    importa(listaAtual) {
+        return this.obterNegociacoes()
+            .then(negociacoes =>
+                negociacoes.filter(negociacao =>
+                    !listaAtual.some(negociacaoExistente =>
+                        negociacao.isEquals(negociacaoExistente)))
+            )
+            .catch(erro => {
+                console.log(erro);
+                throw new Error("Não foi possível importar as negociações");
+            });
     }
 }

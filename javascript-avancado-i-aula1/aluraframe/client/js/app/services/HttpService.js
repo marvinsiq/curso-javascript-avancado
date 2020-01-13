@@ -1,57 +1,82 @@
-class HttpService {
+'use strict';
 
-    get(url) {
+System.register([], function (_export, _context) {
+    "use strict";
 
-        return new Promise((resolve, reject) => {
+    var _createClass, HttpService;
 
-
-            let xhr = new XMLHttpRequest();
-
-            xhr.open('GET', url);
-
-            xhr.onreadystatechange = () => {
-
-                if(xhr.readyState == 4) {
-
-                    if(xhr.status == 200) {   
-
-                        resolve(JSON.parse(xhr.responseText));  
-                    } else {
-
-                        reject(xhr.responseText);
-                    }
-                }
-            };
-
-            xhr.send();
-
-
-        });
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
     }
 
-    post(url, dado) {
+    return {
+        setters: [],
+        execute: function () {
+            _createClass = function () {
+                function defineProperties(target, props) {
+                    for (var i = 0; i < props.length; i++) {
+                        var descriptor = props[i];
+                        descriptor.enumerable = descriptor.enumerable || false;
+                        descriptor.configurable = true;
+                        if ("value" in descriptor) descriptor.writable = true;
+                        Object.defineProperty(target, descriptor.key, descriptor);
+                    }
+                }
 
+                return function (Constructor, protoProps, staticProps) {
+                    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+                    if (staticProps) defineProperties(Constructor, staticProps);
+                    return Constructor;
+                };
+            }();
 
-            return new Promise((resolve, reject) => {
+            _export('HttpService', HttpService = function () {
+                function HttpService() {
+                    _classCallCheck(this, HttpService);
+                }
 
-                let xhr = new XMLHttpRequest();
-                xhr.open("POST", url, true);
-                xhr.setRequestHeader("Content-type", "application/json");
-                xhr.onreadystatechange = () => {
-
-                    if (xhr.readyState == 4) {
-
-                        if (xhr.status == 200) {
-
-                            resolve(JSON.parse(xhr.responseText));
+                _createClass(HttpService, [{
+                    key: '_handleErrors',
+                    value: function _handleErrors(res) {
+                        if (res.ok) {
+                            return res;
                         } else {
-
-                            reject(xhr.responseText);
+                            throw new Error(res.statusText);
                         }
                     }
-                };
-                xhr.send(JSON.stringify(dado)); // usando JSON.stringifly para converter objeto em uma string no formato JSON.
-            });
+                }, {
+                    key: 'get',
+                    value: function get(url) {
+                        var _this = this;
 
+                        return fetch(url).then(function (res) {
+                            return _this._handleErrors(res);
+                        }).then(function (res) {
+                            return res.json();
+                        });
+                    }
+                }, {
+                    key: 'post',
+                    value: function post(url, dado) {
+                        var _this2 = this;
+
+                        return fetch(url, {
+                            headers: { 'Content-Type': 'application/json' },
+                            method: 'post',
+                            body: JSON.stringify(dado)
+                        }).then(function (res) {
+                            return _this2._handleErrors(res);
+                        });
+                    }
+                }]);
+
+                return HttpService;
+            }());
+
+            _export('HttpService', HttpService);
         }
-}
+    };
+});
+//# sourceMappingURL=HttpService.js.map
